@@ -5,45 +5,39 @@
     <title>Density Correction Center</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --primary: #5c5be5; --bg: #f0f2f9; --card: #ffffff; --dark-card: #121625; }
+        :root { --primary: #5c5be5; --bg: #f0f2f9; --card: #ffffff; --dark-card: #121625; --success: #10b981; }
         body { font-family: 'Segoe UI', "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        
         header { background: var(--primary); color: white; padding: 20px 60px; display: flex; justify-content: space-between; align-items: center; }
         .logo-box { display: flex; align-items: center; gap: 15px; }
         .logo-icon { background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; font-size: 24px; }
-
-        main { display: grid; grid-template-columns: 1fr 380px; gap: 30px; padding: 40px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; }
+        
+        main { display: grid; grid-template-columns: 1fr 380px; gap: 30px; padding: 40px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; flex: 1; }
         .card { background: var(--card); border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 30px; }
         .card-title { color: var(--primary); font-weight: bold; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; font-size: 18px; }
-
         label { display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px; }
         input, select { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 15px; background: #fcfcfc; box-sizing: border-box; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-
-        /* 能量選擇區域樣式 */
-        .energy-options-container { 
-            display: flex; flex-wrap: wrap; gap: 10px; 
-            padding: 15px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; min-height: 50px;
-        }
-        .energy-pill {
-            display: flex; align-items: center; gap: 6px;
-            padding: 8px 12px; background: white; border: 1px solid #ddd;
-            border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.2s;
-        }
+        
+        .energy-options-container { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; min-height: 50px; }
+        .energy-pill { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .energy-pill:hover { border-color: var(--primary); color: var(--primary); }
         .energy-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
         .yield-text { font-size: 11px; opacity: 0.7; }
-
-        /* 滑桿與結果顯示 (同前次設計) */
+        
         .slider-box { background: #f8faff; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
         .summary-card { background: var(--dark-card); color: white; border-radius: 24px; padding: 40px 30px; display: flex; flex-direction: column; gap: 35px; min-height: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .val-large { font-size: 48px; font-weight: 600; font-family: 'Courier New', monospace; }
+        .val-large { font-size: 48px; font-weight: 600; font-family: 'Courier New', monospace; color: #fff; }
         .val-medium { font-size: 32px; font-weight: bold; color: #00e676; }
-        .error-container { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); position: relative; }
+        .error-container { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
         .error-val { font-size: 24px; font-weight: bold; color: #ff5252; }
-        
-        .btn-calc { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        #file-drop { border: 2px dashed #cbd5e1; padding: 25px; border-radius: 16px; text-align: center; background: white; margin-bottom: 25px; cursor: pointer; }
+        #file-drop { border: 2px dashed #cbd5e1; padding: 25px; border-radius: 16px; text-align: center; background: white; margin-bottom: 25px; cursor: pointer; transition: 0.3s; }
+
+        /* Footer 樣式 */
+        footer { background: var(--dark-card); color: rgba(255,255,255,0.6); padding: 40px 60px; font-size: 14px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-content { max-width: 1300px; margin: auto; display: flex; justify-content: space-between; align-items: flex-start; }
+        .footer-section { display: flex; flex-direction: column; gap: 10px; }
+        .footer-title { color: white; font-weight: bold; margin-bottom: 5px; }
+        .copyright { margin-top: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -57,7 +51,7 @@
         </div>
     </div>
     <div style="text-align: right;">
-        <div style="font-size: 20px; font-weight: bold;">ρ = 1.0 g/cm³</div>
+        <div id="header-density" style="font-size: 20px; font-weight: bold;">ρ = 1.0 g/cm³</div>
     </div>
 </header>
 
@@ -71,26 +65,26 @@
         <div class="card">
             <div class="card-title">⚙️ Primary Parameters</div>
             <div class="slider-box">
-    <div class="slider-info">
-        <label>Sample Density (g/cm³)</label>
-        <input type="number" id="densityNum" value="0.3" min="0.3" max="2.2" step="0.1" 
-               oninput="syncSlider(this.value)" 
-               onblur="validateDensity(this.value)"
-               style="width: 75px; border: 1px solid #ddd; border-radius: 6px; padding: 4px 8px; font-size: 16px; font-weight: bold; color: var(--primary); text-align: center;">
-    </div>
-    <input type="range" id="densitySlider" min="0.3" max="2.2" step="0.1" value="0.3" 
-           oninput="syncInput(this.value)" style="width: 100%;">
-    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; font-weight: bold; margin-top: 8px;">
-        <span>0.3 MIN</span>
-        <span>1.0 STD</span>
-        <span>2.2 MAX</span>
-    </div>
-</div>
+                <label>Sample Density (g/cm³)</label>
+                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+                    <input type="range" id="densitySlider" min="0.3" max="2.2" step="0.1" value="1.0" 
+                           oninput="syncInput(this.value); autoCalc();" style="flex: 1;">
+                    <input type="number" id="densityNum" value="1.0" min="0.3" max="2.2" step="0.1" 
+                           oninput="syncSlider(this.value); autoCalc();" 
+                           onblur="validateDensity(this.value); autoCalc();"
+                           style="width: 80px; border: 1px solid #ddd; border-radius: 6px; padding: 4px 8px; font-size: 16px; font-weight: bold; color: var(--primary); text-align: center;">
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; font-weight: bold;">
+                    <span>0.3 MIN</span>
+                    <span>1.0 STD</span>
+                    <span>2.2 MAX</span>
+                </div>
+            </div>
 
             <div class="form-row">
                 <div>
                     <label>Select Isotope (核種)</label>
-                    <select id="isotopeSelect" onchange="updateEnergyOptions()">
+                    <select id="isotopeSelect" onchange="updateEnergyOptions();">
                         <option>Wait for file...</option>
                     </select>
                 </div>
@@ -106,16 +100,18 @@
         <div class="card">
             <div class="card-title">📊 Validation & Analysis</div>
             <div class="form-row">
-                <div><label>Measured Activity</label><input type="number" id="measuredVal" placeholder="e.g. 125.4"></div>
-                <div><label>Ground Truth</label><input type="number" id="trueVal" placeholder="e.g. 120.0"></div>
+                <div><label>Measured Activity (Bq/kg)</label><input type="number" id="measuredVal" oninput="autoCalc()" placeholder="e.g. 125.4"></div>
+                <div><label>Ground Truth (Bq/kg)</label><input type="number" id="trueVal" oninput="autoCalc()" placeholder="e.g. 120.0"></div>
             </div>
-            <button class="btn-calc" onclick="calculate()">Run Correction Analysis</button>
         </div>
     </div>
 
     <div class="right-col">
         <div class="summary-card">
-            <div id="init-view" style="text-align:center; margin-top:80px; color:#8e94aa;">Select parameters to begin</div>
+            <div id="init-view" style="text-align:center; margin-top:80px; color:#8e94aa;">
+                <p>Waiting for data...</p>
+                <p style="font-size: 12px;">請上傳檔案並選擇能量與輸入數值</p>
+            </div>
             <div id="result-view" style="display: none;">
                 <div class="sum-label">Weighted Factor (C<sub>d</sub>)</div>
                 <div class="val-large" id="res-cd">1.000000</div>
@@ -123,7 +119,7 @@
                 <div class="sum-label">Corrected Activity</div>
                 <div class="val-medium" id="res-activity">0.00</div>
                 <div class="error-container" style="margin-top: 40px;">
-                    <div class="sum-label">Percentage Error</div>
+                    <div class="sum-label" style="margin-bottom: 10px; opacity: 0.7;">Percentage Error</div>
                     <div class="error-val" id="res-error">0.00%</div>
                 </div>
             </div>
@@ -131,72 +127,106 @@
     </div>
 </main>
 
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <div class="footer-title">關於系統</div>
+            <span>Gamma 射線分析密度校正工具</span>
+            <span>版本：v1.2.0 (2026 Build)</span>
+        </div>
+        <div class="footer-section">
+            <div class="footer-title">技術支援</div>
+            <a href="https://gemini.google.com" target="_blank">https://gemini.google.com</a>
+        </div>
+        <div class="footer-section">
+            <div class="footer-title">使用規範</div>
+            <span>僅供學術交流使用，不可私自販售</span>
+        </div>
+    </div>
+    <div class="copyright">
+        © 2026 Density Correction Center. All rights reserved. 
+    </div>
+</footer>
+
 <script>
     let rawData = [];
     let selectedEnergies = new Set();
-    const slider = document.getElementById('densitySlider');
-    const numInput = document.getElementById('densityNum');
+    let idxEnergy, idxYield, idxIsotope;
 
-    // 當滑桿移動時，同步更新數字框
+    // --- 密度滑桿同步邏輯 (123(1) 邏輯) ---
     function syncInput(val) {
-        numInput.value = val;
+        const n = parseFloat(val);
+        const fixedVal = n.toFixed(1); 
+        document.getElementById('densityNum').value = fixedVal;
+        document.getElementById('header-density').innerText = `ρ = ${fixedVal} g/cm³`;
     }
 
-    // 當數字框輸入時，同步移動滑桿
     function syncSlider(val) {
-        // 只有當輸入是有效數字且在範圍內時才移動滑桿
-        if (val !== "" && val >= 0.3 && val <= 2.2) {
-            slider.value = val;
+        if (val === "") return;
+        let n = parseFloat(val);
+        if (n >= 0.3 && n <= 2.2) {
+            document.getElementById('densitySlider').value = n;
         }
     }
 
-    // 當數字框失去焦點 (Blur) 或按下 Enter 時，強制修正溢出數值
     function validateDensity(val) {
         let n = parseFloat(val);
-        if (isNaN(n) || n < 0.3) {
-            n = 0.3;
-        } else if (n > 2.2) {
-            n = 2.2;
-        }
-        // 修正為小數點後一位
-        n = Math.round(n * 10) / 10;
-        
-        numInput.value = n;
-        slider.value = n;
+        if (isNaN(n) || n < 0.3) n = 0.3;
+        if (n > 2.2) n = 2.2;
+        const finalVal = (Math.round(n * 10) / 10).toFixed(1);
+        document.getElementById('densityNum').value = finalVal;
+        document.getElementById('densitySlider').value = finalVal;
+        document.getElementById('header-density').innerText = `ρ = ${finalVal} g/cm³`;
     }
 
+    // --- 檔案讀取 ---
     document.getElementById('fileInput').onchange = (e) => {
         const file = e.target.files[0];
+        if (!file) return;
         const reader = new FileReader();
+        const dropZone = document.getElementById('file-drop');
+        const fileNameDisplay = document.getElementById('file-name');
+
         reader.onload = (event) => {
             const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'});
             const sheet = workbook.Sheets["工作表1"];
             if(!sheet) return alert("找不到 '工作表1'");
-            rawData = XLSX.utils.sheet_to_json(sheet, {header: 1});
             
-            const isotopes = [...new Set(rawData.slice(2).map(r => r[2]))].filter(Boolean);
+            rawData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+            const headerRow = rawData[1];
+            idxEnergy = headerRow.indexOf("能量範圍(keV)");
+            idxYield = headerRow.indexOf("gamma ray占比");
+            idxIsotope = headerRow.indexOf("核種");
+
+            if (idxEnergy === -1 || idxYield === -1 || idxIsotope === -1) {
+                return alert("Excel 標題不正確，請檢查名稱是否完全符合。");
+            }
+
+            const isotopes = [...new Set(rawData.slice(2).map(r => r[idxIsotope]))].filter(Boolean);
             document.getElementById('isotopeSelect').innerHTML = isotopes.map(i => `<option value="${i}">${i}</option>`).join('');
+            
+            fileNameDisplay.innerText = `✅ 已成功載入：${file.name}`;
+            fileNameDisplay.style.color = "#10b981";
+            dropZone.style.borderColor = "#10b981";
+            dropZone.style.background = "#f0fdf4";
+            
             updateEnergyOptions();
+            alert("檔案上傳成功！");
         };
         reader.readAsArrayBuffer(file);
     };
 
-    // 動態更新能量按鈕
     function updateEnergyOptions() {
         const iso = document.getElementById('isotopeSelect').value;
         const container = document.getElementById('energyOptions');
         selectedEnergies.clear();
-        
-        // 篩選出該核種的所有能量與權重 (索引 0 為能量, 索引 1 為權重)
-        const options = rawData.slice(2).filter(r => String(r[2]).trim() === iso);
-        
+        const options = rawData.slice(2).filter(r => String(r[idxIsotope]).trim() === iso);
         container.innerHTML = options.map(r => {
-            const energy = r[0];
-            const yieldVal = (parseFloat(r[1]) * 100).toFixed(1);
-            return `<div class="energy-pill" onclick="toggleEnergy(this, ${energy})">
-                        ${energy} <span class="yield-text">(${yieldVal}%)</span>
-                    </div>`;
+            const energy = r[idxEnergy];
+            const yieldVal = (parseFloat(r[idxYield]) * 100).toFixed(1);
+            return `<div class="energy-pill" onclick="toggleEnergy(this, ${energy})">${energy} <span class="yield-text">(${yieldVal}%)</span></div>`;
         }).join('');
+        autoCalc(); 
     }
 
     function toggleEnergy(el, energy) {
@@ -207,38 +237,67 @@
             selectedEnergies.add(energy);
             el.classList.add('active');
         }
+        autoCalc(); 
     }
 
-    function calculate() {
-        if(selectedEnergies.size === 0) return alert("請至少選擇一個能量項目");
-        
-        const targetDensity = document.getElementById('densityNum').value.trim();
-        const header = rawData[1].map(h => String(h).trim());
-        const colIdx = header.indexOf(targetDensity);
-        const meas = parseFloat(document.getElementById('measuredVal').value);
-        const truth = parseFloat(document.getElementById('trueVal').value);
+    // --- 自動運算 ---
+    function autoCalc() {
+        const targetDensity = document.getElementById('densityNum').value;
+        const measInput = document.getElementById('measuredVal').value;
+        const truthInput = document.getElementById('trueVal').value;
+        const meas = parseFloat(measInput);
+        const truth = parseFloat(truthInput);
 
-        // 篩選選中的能量列
+        if (rawData.length === 0 || selectedEnergies.size === 0) {
+            document.getElementById('init-view').style.display = 'block';
+            document.getElementById('result-view').style.display = 'none';
+            return;
+        }
+
+        const header = rawData[1].map(h => String(h).trim());
+        const colIdx = header.indexOf(String(targetDensity));
+        
+        if (colIdx === -1) {
+            document.getElementById('res-cd').innerText = "N/A";
+            return;
+        }
+
         const selectedRows = rawData.slice(2).filter(r => 
-            String(r[2]).trim() === document.getElementById('isotopeSelect').value && 
-            selectedEnergies.has(r[0])
+            String(r[idxIsotope]).trim() === document.getElementById('isotopeSelect').value && 
+            selectedEnergies.has(r[idxEnergy])
         );
 
-        const sumW = selectedRows.reduce((s, r) => s + parseFloat(r[1] || 0), 0);
+        const sumW = selectedRows.reduce((s, r) => s + parseFloat(r[idxYield] || 0), 0);
         let cd = 0;
         selectedRows.forEach(r => {
-            cd += parseFloat(r[colIdx] || 0) * (parseFloat(r[1]) / sumW);
+            cd += parseFloat(r[colIdx] || 0) * (parseFloat(r[idxYield]) / sumW);
         });
-
-        const corrAct = meas / cd;
-        const error = ((corrAct - truth) / truth) * 100;
 
         document.getElementById('init-view').style.display = 'none';
         document.getElementById('result-view').style.display = 'block';
         document.getElementById('res-cd').innerText = cd.toFixed(6);
-        document.getElementById('res-activity').innerText = corrAct.toFixed(2) + " Bq/kg";
-        document.getElementById('res-error').innerText = error.toFixed(2) + "%";
-        document.getElementById('res-error').style.color = Math.abs(error) > 20 ? "#ff5252" : "#00e676";
+
+        const actEl = document.getElementById('res-activity').parentElement;
+        const errEl = document.getElementById('res-error').parentElement;
+
+        if (!isNaN(meas)) {
+            const corrAct = meas / cd;
+            document.getElementById('res-activity').innerText = corrAct.toFixed(2) + " Bq/kg";
+            document.getElementById('res-activity').style.opacity = "1";
+            if (!isNaN(truth) && truth !== 0) {
+                const error = ((corrAct - truth) / truth) * 100;
+                document.getElementById('res-error').innerText = error.toFixed(2) + "%";
+                document.getElementById('res-error').style.color = Math.abs(error) > 20 ? "#ff5252" : "#00e676";
+                errEl.style.opacity = "1";
+            } else {
+                document.getElementById('res-error').innerText = "--";
+                errEl.style.opacity = "0.3";
+            }
+        } else {
+            document.getElementById('res-activity').innerText = "Waiting for Input...";
+            document.getElementById('res-activity').style.opacity = "0.3";
+            errEl.style.opacity = "0.3";
+        }
     }
 </script>
 </body>
